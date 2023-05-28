@@ -17,6 +17,7 @@
 		<java.version>1.8</java.version>
 		<spring-cloud-gcp.version>3.5.1</spring-cloud-gcp.version>
 		<spring-cloud.version>2021.0.7</spring-cloud.version>
+		<google.api.services.sheets.version>v4-rev20230227-2.0.0</google.api.services.sheets.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -34,6 +35,20 @@
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-storage</artifactId>
+		</dependency>
+		<!-- Google -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client-jetty</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-sheets</artifactId>
+			<version>${google.api.services.sheets.version}</version>
 		</dependency>
 
 		<dependency>
