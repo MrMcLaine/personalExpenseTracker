@@ -13,6 +13,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import org.springframework.stereotype.Component;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +23,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
+@Component
 public class SheetsQuickstart {
     private static final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -61,8 +64,7 @@ public class SheetsQuickstart {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public static void main(String... args) throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
+    public String getDataFromGoogleSheet() throws GeneralSecurityException, IOException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         final String spreadsheetId = "1V_YkAaLCe616FWkReZ4j99-4wTKJLeKKF_YK3lIMG6Y";
         final String range = "Test!A2:F";
@@ -74,7 +76,7 @@ public class SheetsQuickstart {
                 .get(spreadsheetId, range)
                 .execute();
         List<List<Object>> values = response.getValues();
-        if (values == null || values.isEmpty()) {
+/*        if (values == null || values.isEmpty()) {
             System.out.println("No data found.");
         } else {
             System.out.println("Name, Major");
@@ -82,6 +84,7 @@ public class SheetsQuickstart {
                 System.out.printf("%s, %s, %s, %s, %s, %s\n",
                         row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), row.get(5));
             }
-        }
+        }*/
+        return values.toString();
     }
 }
