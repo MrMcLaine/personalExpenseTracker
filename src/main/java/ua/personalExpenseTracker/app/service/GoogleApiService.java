@@ -2,7 +2,8 @@ package ua.personalExpenseTracker.app.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.personalExpenseTracker.app.config.SheetsQuickstart;
+import ua.personalExpenseTracker.app.config.GoogleApiUtil;
+import ua.personalExpenseTracker.app.dto.GoogleSheetDTO;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -11,8 +12,12 @@ import java.security.GeneralSecurityException;
 public class GoogleApiService {
 
     @Autowired
-    SheetsQuickstart sheetsQuickstart;
+    GoogleApiUtil googleApiUtil;
     public String readDataFromGoogleSheet() throws GeneralSecurityException, IOException {
-        return sheetsQuickstart.getDataFromGoogleSheet();
+        return googleApiUtil.getDataFromGoogleSheet();
+    }
+
+    public String createSheet(GoogleSheetDTO sheetDTO) throws GeneralSecurityException, IOException {
+        return googleApiUtil.createSheet(sheetDTO);
     }
 }

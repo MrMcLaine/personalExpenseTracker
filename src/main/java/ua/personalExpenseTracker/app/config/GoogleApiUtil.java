@@ -12,42 +12,33 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 import org.springframework.stereotype.Component;
+import ua.personalExpenseTracker.app.dto.GoogleSheetDTO;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 @Component
-public class SheetsQuickstart {
+public class GoogleApiUtil {
     private static final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = "tokens/path";
 
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
     private static final List<String> SCOPES =
-            Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+            Arrays.asList(SheetsScopes.SPREADSHEETS, SheetsScopes.DRIVE);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-    /**
-     * Creates an authorized Credential object.
-     *
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
             throws IOException {
         // Load client secrets.
-        InputStream in = SheetsQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = GoogleApiUtil.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
@@ -65,26 +56,34 @@ public class SheetsQuickstart {
     }
 
     public String getDataFromGoogleSheet() throws GeneralSecurityException, IOException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         final String spreadsheetId = "1V_YkAaLCe616FWkReZ4j99-4wTKJLeKKF_YK3lIMG6Y";
         final String range = "Test!A2:F";
-        Sheets service =
-                new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
+        Sheets service = getSheetService();
         ValueRange response = service.spreadsheets().values()
                 .get(spreadsheetId, range)
                 .execute();
         List<List<Object>> values = response.getValues();
-/*        if (values == null || values.isEmpty()) {
-            System.out.println("No data found.");
-        } else {
-            System.out.println("Name, Major");
-            for (List row : values) {
-                System.out.printf("%s, %s, %s, %s, %s, %s\n",
-                        row.get(0), row.get(1), row.get(2), row.get(3), row.get(4), row.get(5));
-            }
-        }*/
         return values.toString();
+    }
+
+    private static Sheets getSheetService() throws GeneralSecurityException, IOException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+    }
+
+    public String createSheet(GoogleSheetDTO sheetDTO) throws GeneralSecurityException, IOException {
+        Sheets service = getSheetService();
+        SpreadsheetProperties spreadsheetProperties = new SpreadsheetProperties();
+        spreadsheetProperties.setTitle(sheetDTO.getSheetName());
+        SheetProperties sheetProperties  = new SheetProperties();
+        sheetProperties.setTitle(sheetDTO.getSheetName());
+
+        Sheet sheet = new Sheet().setProperties(sheetProperties);
+        Spreadsheet spreadsheet = new Spreadsheet()
+                .setProperties(spreadsheetProperties)
+                .setSheets(Collections.singletonList(sheet));
+        return service.spreadsheets().create(spreadsheet).execute().getSpreadsheetUrl();
     }
 }
