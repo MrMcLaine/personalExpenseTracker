@@ -3,6 +3,7 @@ package ua.personalExpenseTracker.app.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.personalExpenseTracker.app.dto.GoogleSheetDTO;
+import ua.personalExpenseTracker.app.dto.GoogleSheetResponseDTO;
 import ua.personalExpenseTracker.app.service.GoogleApiService;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class ExpenseController {
     }
 
     @PostMapping("/createSheet")
-    public String createGoogleSheet(@RequestBody GoogleSheetDTO request) throws GeneralSecurityException, IOException {
+    public GoogleSheetResponseDTO createGoogleSheet(@RequestBody GoogleSheetDTO request) throws GeneralSecurityException, IOException {
         return googleApiService.createSheet(request);
     }
 }

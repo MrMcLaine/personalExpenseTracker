@@ -15,6 +15,7 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
 import org.springframework.stereotype.Component;
 import ua.personalExpenseTracker.app.dto.GoogleSheetDTO;
+import ua.personalExpenseTracker.app.dto.GoogleSheetResponseDTO;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class GoogleApiUtil {
                 .build();
     }
 
-    public String createSheet(GoogleSheetDTO sheetDTO) throws GeneralSecurityException, IOException {
+    public GoogleSheetResponseDTO createSheet(GoogleSheetDTO sheetDTO) throws GeneralSecurityException, IOException {
         Sheets service = getSheetService();
         SpreadsheetProperties spreadsheetProperties = new SpreadsheetProperties();
         spreadsheetProperties.setTitle(sheetDTO.getSheetName());
@@ -84,6 +85,17 @@ public class GoogleApiUtil {
         Spreadsheet spreadsheet = new Spreadsheet()
                 .setProperties(spreadsheetProperties)
                 .setSheets(Collections.singletonList(sheet));
-        return service.spreadsheets().create(spreadsheet).execute().getSpreadsheetUrl();
+        Spreadsheet createdResponse = service.spreadsheets().create(spreadsheet).execute();
+
+        GoogleSheetResponseDTO responseDTO = new GoogleSheetResponseDTO();
+
+        ValueRange valueRange = new ValueRange();
+        valueRange.setValues(sheetDTO.getDataToBeUpdated());
+
+        service.spreadsheets().values().update(createdResponse.getSpreadsheetId(), "A1", valueRange)
+                .setValueInputOption("RAW").execute();
+        responseDTO.setSpreadSheetId(createdResponse.getSpreadsheetId());
+        responseDTO.setSpreadSheetUrl(createdResponse.getSpreadsheetUrl());
+        return responseDTO;
     }
 }
